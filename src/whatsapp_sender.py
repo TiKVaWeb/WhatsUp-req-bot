@@ -68,9 +68,20 @@ def send_message(phone_number: str, text: str, *, profile_path: str | None = Non
         try:
             # Wait for the message box and press ENTER to send.
             input_box = WebDriverWait(driver, 15).until(
-                EC.presence_of_element_located((By.XPATH, "//div[@contenteditable='true' and @data-tab]"))
+                EC.presence_of_element_located(
+                    (By.XPATH, "//div[@contenteditable='true' and @data-tab]")
+                )
+            )
+            prev_out = len(
+                driver.find_elements(By.XPATH, "//div[contains(@class, 'message-out')]")
             )
             input_box.send_keys(Keys.ENTER)
+            WebDriverWait(driver, 10).until(
+                lambda d: len(
+                    d.find_elements(By.XPATH, "//div[contains(@class, 'message-out')]")
+                )
+                > prev_out
+            )
             status = "sent"
         except TimeoutException:
             status = "invalid_number"
