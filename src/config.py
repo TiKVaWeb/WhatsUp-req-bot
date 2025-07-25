@@ -23,7 +23,17 @@ _FILE_CONFIG = _load_file()
 
 
 def get(key: str, default: str | None = None) -> str | None:
-    """Return configuration value from environment or config.json."""
-    if key in os.environ:
-        return os.environ[key]
-    return _FILE_CONFIG.get(key, default)
+    """Return configuration value from environment or config.json.
+
+    The lookup is case insensitive and checks environment variables first.
+    """
+    variations = {key, key.upper(), key.lower()}
+    for variant in variations:
+        if variant in os.environ:
+            return os.environ[variant]
+
+    for variant in variations:
+        if variant in _FILE_CONFIG:
+            return _FILE_CONFIG[variant]
+
+    return default

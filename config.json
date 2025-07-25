@@ -1,3 +1,5 @@
 {
-  "zoom_jwt_token": "REPLACE_WITH_TOKEN"
+  "zoom_client_id": "REPLACE_WITH_CLIENT_ID",
+  "zoom_client_secret": "REPLACE_WITH_CLIENT_SECRET",
+  "zoom_account_id": "REPLACE_WITH_ACCOUNT_ID"
 }

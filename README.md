@@ -52,17 +52,21 @@ This will generate a `database.sqlite3` file in the project root containing the
 required tables.
 
 ## Zoom configuration
-Zoom credentials can be provided through the `config.json` file in the project
-root or via environment variables. The file should contain at least the JWT
-token used for API requests:
+Zoom API requests now use OAuth (Server-to-Server) credentials. Create an app in
+the Zoom marketplace and note the **Client ID**, **Client Secret** and
+**Account ID** values. Add them to `config.json` or export matching environment
+variables:
 
 ```json
 {
-  "zoom_jwt_token": "YOUR_TOKEN_HERE"
+  "zoom_client_id": "YOUR_CLIENT_ID",
+  "zoom_client_secret": "YOUR_CLIENT_SECRET",
+  "zoom_account_id": "YOUR_ACCOUNT_ID"
 }
 ```
 
-Alternatively set the `ZOOM_JWT_TOKEN` environment variable.
+Environment variable names are `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET` and
+`ZOOM_ACCOUNT_ID`.
 
 ## CLI usage
 The project exposes a small command line interface with several commands. Run
