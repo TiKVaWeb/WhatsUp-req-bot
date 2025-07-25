@@ -72,6 +72,16 @@ def log_message(conn: sqlite3.Connection, user_phone: str, message_text: str, st
     return cursor.lastrowid
 
 
+def save_user_survey(conn: sqlite3.Connection, phone: str, name: str, answers: str) -> None:
+    """Save survey answers for a user."""
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT OR REPLACE INTO users (phone, name, survey_date, answers) VALUES (?, ?, ?, ?)",
+        (phone, name, datetime.utcnow().isoformat(), answers),
+    )
+    conn.commit()
+
+
 if __name__ == "__main__":
     with get_connection() as connection:
         init_db(connection)
