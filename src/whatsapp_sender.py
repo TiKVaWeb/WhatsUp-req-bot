@@ -66,7 +66,7 @@ def send_message(phone_number: str, text: str, *, profile_path: str | None = Non
         driver.get(url)
 
         try:
-            # Wait for the message box and press ENTER to send.
+            # Wait for the message input to become available
             input_box = WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located(
                     (By.XPATH, "//div[@contenteditable='true' and @data-tab]")
@@ -75,7 +75,19 @@ def send_message(phone_number: str, text: str, *, profile_path: str | None = Non
             prev_out = len(
                 driver.find_elements(By.XPATH, "//div[contains(@class, 'message-out')]")
             )
-            input_box.send_keys(Keys.ENTER)
+
+            # Attempt to click the send button. If it cannot be located fall
+            # back to pressing ENTER which requires the corresponding WhatsApp
+            # setting to be enabled.
+            try:
+                send_btn = driver.find_element(
+                    By.XPATH,
+                    "//button[@data-testid='compose-btn-send'] | //span[@data-testid='send']",
+                )
+                send_btn.click()
+            except Exception:
+                input_box.send_keys(Keys.ENTER)
+
             WebDriverWait(driver, 10).until(
                 lambda d: len(
                     d.find_elements(By.XPATH, "//div[contains(@class, 'message-out')]")
