@@ -49,3 +49,18 @@ token used for API requests:
 ```
 
 Alternatively set the `ZOOM_JWT_TOKEN` environment variable.
+
+## CLI usage
+The project exposes a small command line interface with several commands. Run
+them using `python -m src.cli` followed by the command name.
+
+```bash
+python -m src.cli send-messages phones.csv
+python -m src.cli update-db
+python -m src.cli stats
+```
+
+`send-messages` imports phone numbers from a CSV file and starts sending a
+default greeting. `update-db` synchronises the SQLite database creating tables if
+needed. `stats` prints how many messages were sent and how many answers were
+recorded.
