@@ -7,6 +7,7 @@ from typing import List
 
 from .database import get_connection, save_user_survey
 from .whatsapp_sender import send_message
+from .zoom import schedule_meeting
 
 # Questions asked during the survey
 QUESTIONS: List[str] = [
@@ -50,7 +51,11 @@ def run_survey(phone: str, name: str) -> None:
             age = 0
         education = answers[1] if len(answers) > 1 else ""
         if _qualifies(age, education):
-            send_message(phone, f"Вы подходите! Приглашаем на встречу: {ZOOM_LINK}")
+            try:
+                link = schedule_meeting({"phone": phone, "name": name})
+            except Exception:
+                link = ZOOM_LINK
+            send_message(phone, f"Вы подходите! Приглашаем на встречу: {link}")
         else:
             send_message(phone, "Спасибо за участие! К сожалению, критерии не соответствуют.")
     finally:
