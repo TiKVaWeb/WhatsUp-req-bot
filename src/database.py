@@ -61,6 +61,17 @@ def init_db(conn: sqlite3.Connection) -> None:
         conn.commit()
 
 
+def log_message(conn: sqlite3.Connection, user_phone: str, message_text: str, status: str) -> int:
+    """Insert a record into the messages table and return its row ID."""
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO messages (user_phone, message_text, status, sent_at) VALUES (?, ?, ?, ?)",
+        (user_phone, message_text, status, datetime.utcnow().isoformat()),
+    )
+    conn.commit()
+    return cursor.lastrowid
+
+
 if __name__ == "__main__":
     with get_connection() as connection:
         init_db(connection)
