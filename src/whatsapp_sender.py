@@ -9,6 +9,7 @@ import os
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -39,7 +40,10 @@ def start_driver(
         options.add_argument(f"--user-data-dir={profile}")
 
     path = driver_path or os.environ.get("CHROMEDRIVER_PATH")
-    service = Service(executable_path=path) if path else None
+    if path:
+        service = Service(executable_path=path)
+    else:
+        service = Service(ChromeDriverManager().install())
     return webdriver.Chrome(service=service, options=options)
 
 

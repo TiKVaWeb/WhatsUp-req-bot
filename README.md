@@ -12,7 +12,7 @@ bot or any other automation.
 ## Requirements
 - Python 3.11 (tested with 3.11.8).
 - Packages listed in `requirements.txt`.
-- Google Chrome and a matching version of ChromeDriver installed.
+- Google Chrome installed (ChromeDriver is downloaded automatically).
 
 ## Setup
 1. Create a virtual environment:
@@ -28,11 +28,10 @@ bot or any other automation.
 Development happens inside the `src/` directory.
 
 ## ChromeDriver configuration
-Selenium requires the [ChromeDriver](https://chromedriver.chromium.org/) binary.
-Make sure it matches your installed Chrome version. If the executable is not
-on your system `PATH` you can specify its location either by setting the
-`CHROMEDRIVER_PATH` environment variable or by passing the path to
-`whatsapp_sender.start_driver()`.
+Selenium relies on the [ChromeDriver](https://chromedriver.chromium.org/) binary.
+If no executable is provided the correct version is downloaded automatically.
+You can still specify a custom path via the `CHROMEDRIVER_PATH` environment
+variable or by passing it to `whatsapp_sender.start_driver()`.
 
 Example:
 
