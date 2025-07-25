@@ -4,8 +4,11 @@ from __future__ import annotations
 
 from urllib.parse import quote_plus
 
+import os
+
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -14,11 +17,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from .database import get_connection, log_message
 
 
-def start_driver() -> webdriver.Chrome:
+def start_driver(driver_path: str | None = None) -> webdriver.Chrome:
     """Return a Selenium WebDriver instance configured for Chrome."""
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
-    return webdriver.Chrome(options=options)
+    path = driver_path or os.environ.get("CHROMEDRIVER_PATH")
+    service = Service(executable_path=path) if path else None
+    return webdriver.Chrome(service=service, options=options)
 
 
 def send_message(phone_number: str, text: str) -> str:
