@@ -55,3 +55,34 @@ def send_message(phone_number: str, text: str) -> str:
         if driver:
             driver.quit()
     return status
+
+
+def wait_for_reply(phone_number: str, timeout: int = 60) -> str | None:
+    """Wait for a reply message from ``phone_number`` within ``timeout`` seconds.
+
+    The function opens WhatsApp Web for the provided phone number and waits
+    until a new incoming message appears in the chat. The text of the last
+    received message is returned or ``None`` if no reply arrives before the
+    timeout expires.
+    """
+
+    driver = start_driver()
+    url = f"https://web.whatsapp.com/send?phone={phone_number}"
+    driver.get(url)
+    last_selector = "//div[contains(@class, 'message-in')]//span[@class='selectable-text']"
+    try:
+        # Ensure the chat has loaded
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "//div[@contenteditable='true' and @data-tab]"))
+        )
+        existing = driver.find_elements(By.XPATH, last_selector)
+        start_count = len(existing)
+        WebDriverWait(driver, timeout).until(
+            lambda d: len(d.find_elements(By.XPATH, last_selector)) > start_count
+        )
+        messages = driver.find_elements(By.XPATH, last_selector)
+        return messages[-1].text if messages else None
+    except TimeoutException:
+        return None
+    finally:
+        driver.quit()

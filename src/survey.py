@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List
+from typing import Callable, List
 
 from .database import get_connection, save_user_survey
-from .whatsapp_sender import send_message
+from .whatsapp_sender import send_message, wait_for_reply
 from .zoom import schedule_meeting
 
 # Questions asked during the survey
@@ -27,10 +27,13 @@ def _qualifies(age: int, education: str) -> bool:
     return AGE_MIN <= age <= AGE_MAX and any(e in education.lower() for e in REQUIRED_EDUCATION)
 
 
-def run_survey(phone: str, name: str) -> None:
+def run_survey(phone: str, name: str, *, get_answer: Callable[[str, str], str | None] | None = None) -> None:
     """Conduct a simple questionnaire with the user."""
     conn = get_connection()
     answers: List[str] = []
+    if get_answer is None:
+        def get_answer(_phone: str, question: str) -> str:
+            return input(f"{question} ")
     try:
         welcome = (
             "Здравствуйте! Мы проводим небольшой опрос по выбору участников "
@@ -40,7 +43,9 @@ def run_survey(phone: str, name: str) -> None:
 
         for question in QUESTIONS:
             send_message(phone, question)
-            answer = input(f"{question} ")
+            answer = get_answer(phone, question)
+            if answer is None:
+                break
             answers.append(answer)
 
         save_user_survey(conn, phone, name, "|".join(answers))
@@ -60,6 +65,15 @@ def run_survey(phone: str, name: str) -> None:
             send_message(phone, "Спасибо за участие! К сожалению, критерии не соответствуют.")
     finally:
         conn.close()
+
+
+def run_survey_whatsapp(phone: str, name: str) -> None:
+    """Run the survey exchanging messages directly via WhatsApp."""
+
+    def _get_answer(_: str, __: str) -> str | None:
+        return wait_for_reply(phone)
+
+    run_survey(phone, name, get_answer=_get_answer)
 
 
 if __name__ == "__main__":
