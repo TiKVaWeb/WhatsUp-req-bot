@@ -98,3 +98,14 @@ python -m src.cli stats
 default greeting. `update-db` synchronises the SQLite database creating tables if
 needed. `stats` prints how many messages were sent and how many answers were
 recorded.
+
+## Survey
+The project contains a small questionnaire implemented in `src/survey.py`. It
+now collects three answers:
+
+1. Age of the participant.
+2. Education level.
+3. Gender.
+
+Only age and education are used for qualification, but the gender value is
+stored alongside the other responses for future use.

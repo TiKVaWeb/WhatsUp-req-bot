@@ -13,6 +13,7 @@ from .zoom import schedule_meeting
 QUESTIONS: List[str] = [
     "Сколько вам лет?",
     "Укажите ваше образование",
+    "Укажите ваш пол",
 ]
 
 # Qualification settings
@@ -22,9 +23,15 @@ REQUIRED_EDUCATION = {"высшее", "higher"}
 ZOOM_LINK = "https://zoom.us/j/123456789"
 
 
-def _qualifies(age: int, education: str) -> bool:
+def _qualifies(age: int, education: str, gender: str | None = None) -> bool:
     """Return ``True`` if the provided answers satisfy the criteria."""
-    return AGE_MIN <= age <= AGE_MAX and any(e in education.lower() for e in REQUIRED_EDUCATION)
+
+    # ``gender`` is currently not part of the qualification logic but is
+    # accepted for future extensions.
+    _ = gender  # unused parameter placeholder
+    return AGE_MIN <= age <= AGE_MAX and any(
+        e in education.lower() for e in REQUIRED_EDUCATION
+    )
 
 
 def run_survey(phone: str, name: str, *, get_answer: Callable[[str, str], str | None] | None = None) -> None:
@@ -55,7 +62,8 @@ def run_survey(phone: str, name: str, *, get_answer: Callable[[str, str], str | 
         except (ValueError, IndexError):
             age = 0
         education = answers[1] if len(answers) > 1 else ""
-        if _qualifies(age, education):
+        gender = answers[2] if len(answers) > 2 else ""
+        if _qualifies(age, education, gender):
             try:
                 link = schedule_meeting({"phone": phone, "name": name})
             except Exception:
