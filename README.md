@@ -36,3 +36,16 @@ python -m src.database
 
 This will generate a `database.sqlite3` file in the project root containing the
 required tables.
+
+## Zoom configuration
+Zoom credentials can be provided through the `config.json` file in the project
+root or via environment variables. The file should contain at least the JWT
+token used for API requests:
+
+```json
+{
+  "zoom_jwt_token": "YOUR_TOKEN_HERE"
+}
+```
+
+Alternatively set the `ZOOM_JWT_TOKEN` environment variable.
