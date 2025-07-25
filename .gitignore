@@ -1,0 +1,22 @@
+# Ignore virtual environments
+venv/
+.env/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Logs and local configs
+*.log
+
+# Test and build outputs
+*.egg-info/
+.dist/
+build/
+
+# IDE directories
+.idea/
+
+# Pytest cache
+.pytest_cache/

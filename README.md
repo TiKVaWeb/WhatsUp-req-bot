@@ -1,0 +1,27 @@
+# WhatsUp Requirement Bot
+
+This repository contains a basic structure for a bot project. The source code lives
+in the `src/` directory. Use this template to start implementing a messaging
+bot or any other automation.
+
+## Goals
+- Provide a clean starting point for development.
+- Isolate dependencies with a virtual environment.
+- Keep the repository small and free from generated files.
+
+## Requirements
+- Python 3.10 or newer.
+- Packages listed in `requirements.txt`.
+
+## Setup
+1. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+Development happens inside the `src/` directory.
