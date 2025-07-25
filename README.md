@@ -10,14 +10,14 @@ bot or any other automation.
 - Keep the repository small and free from generated files.
 
 ## Requirements
-- Python 3.10 or newer.
+- Python 3.11 (tested with 3.11.8).
 - Packages listed in `requirements.txt`.
 
 ## Setup
 1. Create a virtual environment:
    ```bash
-   python -m venv venv
-   source venv/bin/activate
+   python -m venv .venv
+   source .venv/bin/activate
    ```
 2. Install dependencies:
    ```bash
