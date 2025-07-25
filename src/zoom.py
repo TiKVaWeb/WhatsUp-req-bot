@@ -4,21 +4,64 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
+import base64
+import time
+
 import requests
 
 from . import config
 
 _API_URL = "https://api.zoom.us/v2"
 
+_TOKEN: str | None = None
+_EXPIRES_AT: float = 0.0
+
 
 class ZoomAPIError(Exception):
     """Raised when Zoom API returns an error."""
 
 
+def get_access_token() -> str:
+    """Return a valid OAuth access token, refreshing if necessary."""
+    global _TOKEN, _EXPIRES_AT
+
+    now = time.time()
+    if _TOKEN and now < _EXPIRES_AT - 30:
+        return _TOKEN
+
+    client_id = config.get("ZOOM_CLIENT_ID") or config.get("zoom_client_id")
+    client_secret = config.get("ZOOM_CLIENT_SECRET") or config.get("zoom_client_secret")
+    account_id = config.get("ZOOM_ACCOUNT_ID") or config.get("zoom_account_id")
+
+    if not (client_id and client_secret and account_id):
+        raise ZoomAPIError("Zoom OAuth credentials not configured")
+
+    creds = f"{client_id}:{client_secret}".encode()
+    headers = {
+        "Authorization": f"Basic {base64.b64encode(creds).decode()}",
+    }
+
+    params = {
+        "grant_type": "account_credentials",
+        "account_id": account_id,
+    }
+
+    url = "https://zoom.us/oauth/token"
+    resp = requests.post(url, headers=headers, params=params, timeout=10)
+    if resp.status_code >= 400:
+        raise ZoomAPIError(f"Token request failed: {resp.text}")
+
+    data = resp.json()
+    _TOKEN = data.get("access_token")
+    expires_in = int(data.get("expires_in", 0))
+    _EXPIRES_AT = now + expires_in
+    if not _TOKEN:
+        raise ZoomAPIError("Zoom token missing in response")
+
+    return _TOKEN
+
 def _auth_headers() -> dict[str, str]:
-    token = config.get("ZOOM_JWT_TOKEN") or config.get("zoom_jwt_token")
-    if not token:
-        raise ZoomAPIError("Zoom JWT token not configured")
+    token = get_access_token()
     return {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
