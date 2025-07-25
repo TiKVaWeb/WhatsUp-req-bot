@@ -25,3 +25,14 @@ bot or any other automation.
    ```
 
 Development happens inside the `src/` directory.
+
+## Database
+The project uses SQLite for storing user data and outgoing messages. To create
+the local database with some example records run:
+
+```bash
+python -m src.database
+```
+
+This will generate a `database.sqlite3` file in the project root containing the
+required tables.
