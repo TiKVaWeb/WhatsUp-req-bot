@@ -17,28 +17,47 @@ from selenium.webdriver.support.ui import WebDriverWait
 from .database import get_connection, log_message
 
 
-def start_driver(driver_path: str | None = None) -> webdriver.Chrome:
-    """Return a Selenium WebDriver instance configured for Chrome."""
+def start_driver(
+    driver_path: str | None = None,
+    profile_path: str | None = None,
+    *,
+    headless: bool = True,
+) -> webdriver.Chrome:
+    """Return a Selenium WebDriver instance configured for Chrome.
+
+    ``profile_path`` or the ``CHROME_PROFILE_DIR`` environment variable can be
+    used to specify a Chrome user data directory. Set ``headless=False`` when
+    signing in for the first time to display the browser window.
+    """
+
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
+    if headless:
+        options.add_argument("--headless")
+
+    profile = profile_path or os.environ.get("CHROME_PROFILE_DIR")
+    if profile:
+        options.add_argument(f"--user-data-dir={profile}")
+
     path = driver_path or os.environ.get("CHROMEDRIVER_PATH")
     service = Service(executable_path=path) if path else None
     return webdriver.Chrome(service=service, options=options)
 
 
-def send_message(phone_number: str, text: str) -> str:
+def send_message(phone_number: str, text: str, *, profile_path: str | None = None) -> str:
     """Send a WhatsApp message to ``phone_number``.
 
-    The function launches WhatsApp Web, sends ``text`` to the given phone
-    number, writes a record to the database and returns the send status.
-    Possible statuses are ``"sent"``, ``"invalid_number"`` and
-    ``"connection_error"``.
+    ``profile_path`` can point to a Chrome profile directory or be omitted to
+    rely on ``CHROME_PROFILE_DIR``. The function launches WhatsApp Web, sends
+    ``text`` to the given phone number, writes a record to the database and
+    returns the send status. Possible statuses are ``"sent"``,
+    ``"invalid_number"`` and ``"connection_error"``.
     """
     status = "sent"
     conn = get_connection()
     driver = None
+    profile = profile_path or os.environ.get("CHROME_PROFILE_DIR")
     try:
-        driver = start_driver()
+        driver = start_driver(profile_path=profile)
         url = f"https://web.whatsapp.com/send?phone={phone_number}&text={quote_plus(text)}"
         driver.get(url)
 
@@ -62,16 +81,17 @@ def send_message(phone_number: str, text: str) -> str:
     return status
 
 
-def wait_for_reply(phone_number: str, timeout: int = 60) -> str | None:
+def wait_for_reply(phone_number: str, timeout: int = 60, *, profile_path: str | None = None) -> str | None:
     """Wait for a reply message from ``phone_number`` within ``timeout`` seconds.
 
-    The function opens WhatsApp Web for the provided phone number and waits
-    until a new incoming message appears in the chat. The text of the last
-    received message is returned or ``None`` if no reply arrives before the
-    timeout expires.
+    ``profile_path`` behaves like in :func:`send_message`. The function opens
+    WhatsApp Web for the provided phone number and waits until a new incoming
+    message appears in the chat. The text of the last received message is
+    returned or ``None`` if no reply arrives before the timeout expires.
     """
 
-    driver = start_driver()
+    profile = profile_path or os.environ.get("CHROME_PROFILE_DIR")
+    driver = start_driver(profile_path=profile)
     url = f"https://web.whatsapp.com/send?phone={phone_number}"
     driver.get(url)
     last_selector = "//div[contains(@class, 'message-in')]//span[@class='selectable-text']"

@@ -40,6 +40,23 @@ Example:
 export CHROMEDRIVER_PATH=/opt/chromedriver
 ```
 
+## WhatsApp Web profile
+To keep the WhatsApp session active between runs create a separate Chrome
+profile and sign in once manually. Launch Chrome with the desired directory,
+open WhatsApp Web and scan the QR code:
+
+```bash
+google-chrome --user-data-dir=/path/to/wa-profile https://web.whatsapp.com
+```
+
+Set the ``CHROME_PROFILE_DIR`` environment variable to this directory (or pass
+the path to ``send_message()``/``wait_for_reply()``) before running the bot:
+
+```bash
+export CHROME_PROFILE_DIR=/path/to/wa-profile
+```
+
+
 ## Database
 The project uses SQLite for storing user data and outgoing messages. To create
 the local database with some example records run:
