@@ -62,7 +62,7 @@ def send_message(phone_number: str, text: str, *, profile_path: str | None = Non
     profile = profile_path or os.environ.get("CHROME_PROFILE_DIR")
     try:
         driver = start_driver(profile_path=profile)
-        url = f"https://web.whatsapp.com/send?phone={phone_number}&text={quote_plus(text)}"
+        url = f"https://web.whatsapp.com/send?phone={phone_number}"
         driver.get(url)
 
         try:
@@ -72,6 +72,7 @@ def send_message(phone_number: str, text: str, *, profile_path: str | None = Non
                     (By.XPATH, "//div[@contenteditable='true' and @data-tab]")
                 )
             )
+            input_box.send_keys(text)
             prev_out = len(
                 driver.find_elements(By.XPATH, "//div[contains(@class, 'message-out')]")
             )
