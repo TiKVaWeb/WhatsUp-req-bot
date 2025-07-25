@@ -1,1 +1,2 @@
-# Add your project dependencies here
+pywhatkit==5.4
+selenium==4.34.2
