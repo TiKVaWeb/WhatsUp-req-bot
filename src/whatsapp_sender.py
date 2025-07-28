@@ -13,7 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from .database import get_connection, log_message
 
-# --- Configuration constants ---
+# --- Константы конфигурации ---
 DEFAULT_TIMEOUTS: Dict[str, int] = {
     "load_chat": 30,
     "button_click": 5,

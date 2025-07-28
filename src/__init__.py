@@ -1,1 +1,1 @@
-# Package initialization
+# Инициализация пакета

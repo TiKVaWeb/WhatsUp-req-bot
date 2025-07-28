@@ -1,4 +1,4 @@
-"""Zoom API helper functions."""
+"""Вспомогательные функции для работы с Zoom API."""
 
 from __future__ import annotations
 
@@ -18,11 +18,11 @@ _EXPIRES_AT: float = 0.0
 
 
 class ZoomAPIError(Exception):
-    """Raised when Zoom API returns an error."""
+    """Вызывается, когда Zoom API возвращает ошибку."""
 
 
 def get_access_token() -> str:
-    """Return a valid OAuth access token, refreshing if necessary."""
+    """Вернуть действительный OAuth‑токен, обновляя его при необходимости."""
     global _TOKEN, _EXPIRES_AT
 
     now = time.time()
@@ -69,7 +69,7 @@ def _auth_headers() -> dict[str, str]:
 
 
 def create_meeting(payload: Mapping[str, Any]) -> str:
-    """Create a Zoom meeting and return the join URL."""
+    """Создать встречу в Zoom и вернуть ссылку для подключения."""
     url = f"{_API_URL}/users/me/meetings"
     response = requests.post(url, headers=_auth_headers(), json=payload, timeout=10)
     if response.status_code >= 400:
@@ -79,9 +79,9 @@ def create_meeting(payload: Mapping[str, Any]) -> str:
 
 
 def schedule_meeting(user_info: Mapping[str, Any]) -> str:
-    """Schedule a meeting for a user and return the join link."""
+    """Запланировать встречу для пользователя и вернуть ссылку."""
     payload = {
         "topic": f"Interview with {user_info.get('name', '')}",
-        "type": 1,  # instant meeting
+        "type": 1,  # мгновенная встреча
     }
     return create_meeting(payload)

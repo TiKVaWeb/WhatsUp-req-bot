@@ -6,12 +6,12 @@ DB_PATH = Path(__file__).resolve().parent.parent / "database.sqlite3"
 
 
 def get_connection(path: Path = DB_PATH) -> sqlite3.Connection:
-    """Return a connection to the SQLite database."""
+    """Вернуть подключение к базе данных SQLite."""
     return sqlite3.connect(path)
 
 
 def init_db(conn: sqlite3.Connection) -> None:
-    """Create tables if they do not exist and insert sample data."""
+    """Создать таблицы при отсутствии и добавить примеры данных."""
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -37,7 +37,7 @@ def init_db(conn: sqlite3.Connection) -> None:
     )
     conn.commit()
 
-    # Insert sample data if tables are empty
+    # Вставить пример данных, если таблицы пусты
     cursor.execute("SELECT COUNT(*) FROM users")
     if cursor.fetchone()[0] == 0:
         cursor.execute(
@@ -62,7 +62,7 @@ def init_db(conn: sqlite3.Connection) -> None:
 
 
 def log_message(conn: sqlite3.Connection, user_phone: str, message_text: str, status: str) -> int:
-    """Insert a record into the messages table and return its row ID."""
+    """Добавить запись в таблицу сообщений и вернуть её ID."""
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO messages (user_phone, message_text, status, sent_at) VALUES (?, ?, ?, ?)",
@@ -73,7 +73,7 @@ def log_message(conn: sqlite3.Connection, user_phone: str, message_text: str, st
 
 
 def save_user_survey(conn: sqlite3.Connection, phone: str, name: str, answers: str) -> None:
-    """Save survey answers for a user."""
+    """Сохранить ответы пользователя на опрос."""
     cursor = conn.cursor()
     cursor.execute(
         "INSERT OR REPLACE INTO users (phone, name, survey_date, answers) VALUES (?, ?, ?, ?)",

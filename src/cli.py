@@ -12,14 +12,14 @@ from .survey import run_survey_whatsapp
 
 @click.group()
 def cli():
-    """Command line interface for WhatsUp bot."""
+    """Командная оболочка для бота WhatsUp."""
     pass
 
 
 @cli.command("send-messages")
 @click.argument("csv_file", type=click.Path(exists=True, path_type=Path))
 def send_messages_cmd(csv_file: Path) -> None:
-    """Import phone numbers from CSV_FILE and send messages."""
+    """Импортировать номера из CSV_FILE и отправить сообщения."""
     with open(csv_file, newline="", encoding="utf-8") as fh:
         try:
             reader = csv.DictReader(fh)
@@ -43,7 +43,7 @@ def send_messages_cmd(csv_file: Path) -> None:
 @click.argument("csv_file", type=click.Path(exists=True, path_type=Path))
 @click.option("--workers", default=1, show_default=True, help="Parallel surveys")
 def run_survey_cmd(csv_file: Path, workers: int) -> None:
-    """Run the interactive survey with phone numbers from CSV_FILE."""
+    """Запустить интерактивный опрос для номеров из CSV_FILE."""
 
     with open(csv_file, newline="", encoding="utf-8") as fh:
         try:
@@ -75,7 +75,7 @@ def run_survey_cmd(csv_file: Path, workers: int) -> None:
 
 @cli.command("update-db")
 def update_db_cmd() -> None:
-    """Initialize or update the SQLite database."""
+    """Инициализировать или обновить базу данных SQLite."""
     with get_connection() as conn:
         init_db(conn)
     click.echo("Database updated")
@@ -83,7 +83,7 @@ def update_db_cmd() -> None:
 
 @cli.command()
 def stats() -> None:
-    """Print simple statistics about sent messages and survey replies."""
+    """Показать статистику отправленных сообщений и ответов на опрос."""
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("SELECT COUNT(*) FROM messages")

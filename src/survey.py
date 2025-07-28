@@ -1,4 +1,4 @@
-"""Simple survey dialogue over WhatsApp."""
+"""Простой диалог опроса в WhatsApp."""
 
 from __future__ import annotations
 
@@ -9,14 +9,14 @@ from .database import get_connection, save_user_survey
 from .whatsapp_sender import send_message, wait_for_reply
 from .zoom import schedule_meeting
 
-# Questions asked during the survey
+# Вопросы, задаваемые в ходе опроса
 QUESTIONS: List[str] = [
     "Сколько вам лет?",
     "Укажите ваше образование",
     "Укажите ваш пол",
 ]
 
-# Qualification settings
+# Настройки квалификации
 AGE_MIN = 25
 AGE_MAX = 35
 REQUIRED_EDUCATION = {"высшее", "higher"}
@@ -24,18 +24,18 @@ ZOOM_LINK = "https://zoom.us/j/123456789"
 
 
 def _qualifies(age: int, education: str, gender: str | None = None) -> bool:
-    """Return ``True`` if the provided answers satisfy the criteria."""
+    """Вернуть ``True``, если ответы удовлетворяют критериям."""
 
-    # ``gender`` is currently not part of the qualification logic but is
-    # accepted for future extensions.
-    _ = gender  # unused parameter placeholder
+    # параметр ``gender`` пока не участвует в логике отбора, но оставлен для
+    # будущих расширений
+    _ = gender  # заглушка для неиспользуемого параметра
     return AGE_MIN <= age <= AGE_MAX and any(
         e in education.lower() for e in REQUIRED_EDUCATION
     )
 
 
 def run_survey(phone: str, name: str, *, get_answer: Callable[[str, str], str | None] | None = None) -> None:
-    """Conduct a simple questionnaire with the user."""
+    """Провести с пользователем простой опрос."""
     conn = get_connection()
     answers: List[str] = []
     if get_answer is None:
@@ -76,7 +76,7 @@ def run_survey(phone: str, name: str, *, get_answer: Callable[[str, str], str | 
 
 
 def run_survey_whatsapp(phone: str, name: str) -> None:
-    """Run the survey exchanging messages directly via WhatsApp."""
+    """Запустить опрос, обмениваясь сообщениями через WhatsApp."""
 
     def _get_answer(_: str, __: str) -> str | None:
         return wait_for_reply(phone)

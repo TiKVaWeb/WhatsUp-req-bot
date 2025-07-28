@@ -1,78 +1,57 @@
-# WhatsUp Requirement Bot
+# Бот WhatsUp Requirement
 
-This repository contains a basic structure for a bot project. The source code lives
-in the `src/` directory. Use this template to start implementing a messaging
-bot or any other automation.
+Этот репозиторий содержит базовую структуру проекта для бота. Исходный код находится в каталоге `src/`. Используйте шаблон для создания мессенджер‑бота или другой автоматизации.
 
-## Goals
-- Provide a clean starting point for development.
-- Isolate dependencies with a virtual environment.
-- Keep the repository small and free from generated files.
+## Цели
+- Предоставить чистую отправную точку для разработки.
+- Изолировать зависимости в виртуальном окружении.
+- Держать репозиторий небольшим и без сгенерированных файлов.
 
-## Requirements
-- Python 3.11 (tested with 3.11.8).
-- Packages listed in `requirements.txt`.
-- Google Chrome installed (ChromeDriver is downloaded automatically).
+## Требования
+- Python 3.11 (проверено на версии 3.11.8).
+- Пакеты из `requirements.txt`.
+- Установленный Google Chrome (ChromeDriver загружается автоматически).
 
-## Setup
-1. Create a virtual environment:
+## Настройка
+1. Создайте виртуальное окружение:
    ```bash
    python -m venv .venv
    source .venv/bin/activate
    ```
-2. Install dependencies from the requirements file:
+2. Установите зависимости из файла requirements:
    ```bash
    pip install -r requirements.txt
    ```
 
-Development happens inside the `src/` directory.
+Разработка ведётся в каталоге `src/`.
 
-## ChromeDriver configuration
-Selenium relies on the [ChromeDriver](https://chromedriver.chromium.org/) binary.
-If no executable is provided the correct version is downloaded automatically.
-You can still specify a custom path via the `CHROMEDRIVER_PATH` environment
-variable or by passing it to `whatsapp_sender.start_driver()`.
+## Настройка ChromeDriver
+Selenium использует бинарный файл [ChromeDriver](https://chromedriver.chromium.org/). Если путь к исполняемому файлу не задан, подходящая версия будет загружена автоматически. При необходимости можно указать свой путь через переменную окружения `CHROMEDRIVER_PATH` или передать его в `whatsapp_sender.start_driver()`.
 
-Example:
-
+Пример:
 ```bash
 export CHROMEDRIVER_PATH=/opt/chromedriver
 ```
 
-## WhatsApp Web profile
-To keep the WhatsApp session active between runs create a separate Chrome
-profile and sign in once manually. Launch Chrome with the desired directory,
-open WhatsApp Web and scan the QR code:
-
+## Профиль WhatsApp Web
+Чтобы сессия WhatsApp оставалась активной между запусками, создайте отдельный профиль Chrome и один раз войдите вручную. Запустите Chrome с нужным каталогом, откройте WhatsApp Web и отсканируйте QR‑код:
 ```bash
 google-chrome --user-data-dir=/path/to/wa-profile https://web.whatsapp.com
 ```
-
-Set the ``CHROME_PROFILE_DIR`` environment variable to this directory (or pass
-the path to ``send_message()``/``wait_for_reply()``) before running the bot:
-
+Укажите переменную окружения ``CHROME_PROFILE_DIR`` на этот каталог (или передайте путь в ``send_message()``/``wait_for_reply()``) перед запуском бота:
 ```bash
 export CHROME_PROFILE_DIR=/path/to/wa-profile
 ```
 
-
-## Database
-The project uses SQLite for storing user data and outgoing messages. To create
-the local database with some example records run:
-
+## База данных
+Проект использует SQLite для хранения данных пользователей и исходящих сообщений. Чтобы создать локальную базу с примером данных, выполните:
 ```bash
 python -m src.database
 ```
+В корне проекта появится файл `database.sqlite3` с необходимыми таблицами.
 
-This will generate a `database.sqlite3` file in the project root containing the
-required tables.
-
-## Zoom configuration
-Zoom API requests now use OAuth (Server-to-Server) credentials. Create an app in
-the Zoom marketplace and note the **Client ID**, **Client Secret** and
-**Account ID** values. Add them to `config.json` or export matching environment
-variables:
-
+## Настройка Zoom
+Запросы к Zoom теперь используют OAuth (Server-to-Server). Создайте приложение в маркетплейсе Zoom и запишите значения **Client ID**, **Client Secret** и **Account ID**. Добавьте их в `config.json` или экспортируйте переменные окружения:
 ```json
 {
   "zoom_client_id": "YOUR_CLIENT_ID",
@@ -80,38 +59,25 @@ variables:
   "zoom_account_id": "YOUR_ACCOUNT_ID"
 }
 ```
+Названия переменных окружения: `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET`, `ZOOM_ACCOUNT_ID`.
 
-Environment variable names are `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET` and
-`ZOOM_ACCOUNT_ID`.
-
-## CLI usage
-The project exposes a small command line interface with several commands. Run
-them using `python -m src.cli` followed by the command name.
-
+## Использование CLI
+Проект предоставляет небольшую консольную утилиту с несколькими командами. Запускайте их через `python -m src.cli` и имя команды.
 ```bash
 python -m src.cli send-messages phones.csv
 python -m src.cli update-db
 python -m src.cli stats
 python -m src.cli survey phones.csv --workers 2
 ```
+`send-messages` импортирует номера из CSV и начинает отправлять приветствие. `update-db` синхронизирует базу SQLite, создавая таблицы при необходимости. `stats` выводит, сколько сообщений отправлено и сколько ответов получено. `survey` запускает опрос для каждого номера из CSV. Опция ``--workers`` позволяет обрабатывать несколько номеров параллельно.
 
-`send-messages` imports phone numbers from a CSV file and starts sending a
-default greeting. `update-db` synchronises the SQLite database creating tables if
-needed. `stats` prints how many messages were sent and how many answers were
-recorded. `survey` launches the questionnaire for every phone number from the
-CSV file. Use the ``--workers`` option to process several numbers in parallel.
+## Опрос
+В `src/survey.py` реализован небольшой опросник, который собирает три ответа:
 
-## Survey
-The project contains a small questionnaire implemented in `src/survey.py`. It
-now collects three answers:
+1. Возраст участника.
+2. Уровень образования.
+3. Пол.
 
-1. Age of the participant.
-2. Education level.
-3. Gender.
+Для квалификации используются только возраст и образование, но значение пола сохраняется вместе с остальными ответами на будущее.
 
-Only age and education are used for qualification, but the gender value is
-stored alongside the other responses for future use.
-
-The `survey` command expects a CSV file containing one phone number per line.
-The bot sends a welcome message, asks all questions and, if the answers match
-the criteria, replies with a Zoom invitation link.
+Команда `survey` ожидает CSV‑файл с одним номером телефона в строке. Бот отправляет приветствие, задаёт вопросы и, если ответы подходят под критерии, присылает ссылку на встречу в Zoom.

@@ -1,4 +1,4 @@
-"""Configuration loading utilities."""
+"""Утилиты загрузки конфигурации."""
 
 from __future__ import annotations
 
@@ -23,9 +23,9 @@ _FILE_CONFIG = _load_file()
 
 
 def get(key: str, default: str | None = None) -> str | None:
-    """Return configuration value from environment or config.json.
+    """Вернуть значение конфигурации из окружения или файла ``config.json``.
 
-    The lookup is case insensitive and checks environment variables first.
+    Поиск не чувствителен к регистру и сперва проверяет переменные окружения.
     """
     variations = {key, key.upper(), key.lower()}
     for variant in variations:
