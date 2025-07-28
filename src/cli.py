@@ -4,7 +4,10 @@ from pathlib import Path
 import click
 
 from .database import get_connection, init_db
+from threading import Semaphore, Thread
+
 from .whatsapp_sender import send_message
+from .survey import run_survey_whatsapp
 
 
 @click.group()
@@ -34,6 +37,40 @@ def send_messages_cmd(csv_file: Path) -> None:
                 send_message(phone, text)
             except Exception as exc:
                 click.echo(f"Error sending to {phone}: {exc}")
+
+
+@cli.command("survey")
+@click.argument("csv_file", type=click.Path(exists=True, path_type=Path))
+@click.option("--workers", default=1, show_default=True, help="Parallel surveys")
+def run_survey_cmd(csv_file: Path, workers: int) -> None:
+    """Run the interactive survey with phone numbers from CSV_FILE."""
+
+    with open(csv_file, newline="", encoding="utf-8") as fh:
+        try:
+            reader = csv.DictReader(fh)
+            use_dict = "phone" in (reader.fieldnames or [])
+        except csv.Error:
+            fh.seek(0)
+            use_dict = False
+            reader = csv.reader(fh)
+        phones = [row["phone"] if use_dict else row[0] for row in reader]
+
+    sem = Semaphore(workers)
+    threads: list[Thread] = []
+
+    def worker(number: str) -> None:
+        with sem:
+            click.echo(f"\nStarting survey for {number}")
+            run_survey_whatsapp(number, number)
+            click.echo(f"Finished survey for {number}")
+
+    for num in phones:
+        thread = Thread(target=worker, args=(num,), daemon=True)
+        threads.append(thread)
+        thread.start()
+
+    for t in threads:
+        t.join()
 
 
 @cli.command("update-db")
