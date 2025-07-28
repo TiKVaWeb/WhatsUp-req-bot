@@ -1,5 +1,3 @@
-# Бот WhatsUp Requirement
-
 ## Требования
 - Python 3.11 (проверено на версии 3.11.8).
 - Пакеты из `requirements.txt`.
