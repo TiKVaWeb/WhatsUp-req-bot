@@ -92,12 +92,14 @@ them using `python -m src.cli` followed by the command name.
 python -m src.cli send-messages phones.csv
 python -m src.cli update-db
 python -m src.cli stats
+python -m src.cli survey phones.csv --workers 2
 ```
 
 `send-messages` imports phone numbers from a CSV file and starts sending a
 default greeting. `update-db` synchronises the SQLite database creating tables if
 needed. `stats` prints how many messages were sent and how many answers were
-recorded.
+recorded. `survey` launches the questionnaire for every phone number from the
+CSV file. Use the ``--workers`` option to process several numbers in parallel.
 
 ## Survey
 The project contains a small questionnaire implemented in `src/survey.py`. It
@@ -109,3 +111,7 @@ now collects three answers:
 
 Only age and education are used for qualification, but the gender value is
 stored alongside the other responses for future use.
+
+The `survey` command expects a CSV file containing one phone number per line.
+The bot sends a welcome message, asks all questions and, if the answers match
+the criteria, replies with a Zoom invitation link.
